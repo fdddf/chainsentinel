@@ -5,16 +5,11 @@ Move finished tasks to the bottom with the commit hash.
 
 ## Open
 
-1. **Iteration 3: one more hop for the 48% of dev that siblings cannot reach.**
-   Parents (paid ≥ 1 ETH to ≥ 2 seed funders) → uncles → cousins; `fetch_seeds.py --hop3/--hop4`, cached, service guard.
-   Goal: raise recall@all above 0.523 without dropping recall@50 below iteration 2.
-2. **Iteration 4: sinks.** Every seed edge points into the seed; no seed sent anything before 2026-11-01.
-   Fetch the top candidates' own activity (expansion from the rule's own candidates)
-   and demote candidates that sent funds out in the window (distributors, pass-throughs, exchange deposits).
-3. **Service-address filter** (partly done by the truncation guard in `--hop3`).
-4. **Ablation and sensitivity**: rerun the best rule with `seed=1..5` to show variance of recall (if time).
-5. **Final** (from 16:00 at the latest): `python scripts/final_report.py` → `results/final.json`,
-   `results/recall_by_iteration.png`; README "Results" section with table, links and limits.
+1. **Final**: `python scripts/final_report.py` → `results/final.json`, `results/recall_by_iteration.png`;
+   README "Results" section with table, links and limits.
+2. **Ablation and sensitivity**: rerun the best rule with `seed=1..5` to show variance of recall (next session).
+3. **Service filter for candidates**: exchanges such as Binance's hot wallet reach the cousin list (iteration 3); demote them before ranking (next session).
+4. **Lift the uncle cap** (600 of 3181) and widen the window past 2026-11-01 for the 31% of dev still unreached (next session).
 
 ## Done
 
@@ -26,3 +21,5 @@ Move finished tasks to the bottom with the commit hash.
 - Iteration 1 siblings: dev recall@50 0.074, recall@all 0.523 — 7cbbcf5.
 - Ceiling analysis: split-agnostic expected max of dev recall@50 ≈ 0.103 — 5702507.
 - Iteration 2 similarity: dev recall@50 0.095, recall@all 0.523 — 5702507.
+- Iteration 3 cousins: dev recall@all 0.523 → 0.687 — 682b9ba.
+- Iteration 4 sinks: dev recall@50 0.095, recall@331 0.523 → 0.576; condition 1 met by three documented failures.

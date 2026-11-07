@@ -33,7 +33,7 @@ def load_edges(candidate_edges: bool = False):
         path = ROOT / "data" / name
         if cache_exists(path):
             with open_text(path) as f:
-                rows.extend(csv.DictReader(f))
+                rows.extend(dict(r, source=name.split(".")[0]) for r in csv.DictReader(f))
     for r in rows:
         r["value"] = float(r["value"])
         r["timestamp"] = int(r["timestamp"])

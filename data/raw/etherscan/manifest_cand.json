@@ -1,0 +1,11 @@
+{
+  "source": "results/candidates_iter_3.csv",
+  "top_k": 600,
+  "n_addresses": 600,
+  "n_edges": 490110,
+  "truncated": [
+    "0x28c6c06298d514db089934071355e5743bf21d60:tokentx"
+  ],
+  "api_calls": 1043,
+  "fetched_at": "2026-11-07T13:48:56+00:00"
+}

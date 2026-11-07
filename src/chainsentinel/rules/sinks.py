@@ -25,4 +25,6 @@ def demote_senders(ranking, edges):
 
 
 def rank(edges, seeds) -> list[str]:
-    return demote_senders(rank_cousins(edges, seeds), edges)
+    # The base ranking is iteration 3's on the same graph; the candidates' own files only supply evidence of sending.
+    graph = [e for e in edges if e.get("source") != "edges_cand"]
+    return demote_senders(rank_cousins(graph, seeds), edges)

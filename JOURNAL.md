@@ -205,3 +205,41 @@ so the top 50 cannot change. Even interleaving would not help, because the top 5
 Still out of reach: 76 dev addresses (31%).
 They may hang off the 2581 uncles cut by the cap, behind the two parents marked as services,
 or be funded outside the 2026-10-27 to 11-01 window.
+
+**14:25–14:48 — Own activity of the top candidates fetched** (`scripts/fetch_candidates.py`,
+expansion from the rule's own candidates: iteration 2's 331, then iteration 3's top 600; 2186 API calls).
+Label-free check first: only 19 of the 331 siblings sent ≥ 0.01 ETH in the window, none of them in the top 50 and 2 in the top 100.
+So the sink signal could reorder only below rank 50.
+Two of these "candidates" are services: Binance's hot wallet `0x28c6…1d60` entered iteration 3 as a cousin at rank 368,
+and `0x23617e59…` is both a sibling (rank 325) and a parent marked as a service.
+Iteration 3 lets services through as candidates; iteration 4 is meant to push them down.
+
+**14:49 — Iteration 4 (sinks): recall@50 unchanged at 0.095 (failure 3 of 3); mid-ranks improve.**
+Rule `rules/sinks.py`, tests `tests/test_sinks.py`.
+*Process note:* the first two tests were written together with the rule, not run failing first.
+A third test was added after the first run showed that the candidates' files leaked into the base graph
+(1991 → 2486 candidates, because the candidates' payments created new parents and uncles).
+Fixed: the base ranking uses the same graph as iteration 3, and the candidates' files only supply evidence of sending.
+The first score was discarded.
+819 of the 1991 candidates sent ≥ 0.01 ETH in the window and were moved down: 19 siblings, 107 of the top 600.
+Dev, `results/iter_4.json` (precision is a lower bound), against iteration 3:
+
+| k | iter 3 hits | iter 4 hits | iter 4 recall@k | iter 4 precision_lb@k |
+|---|---|---|---|---|
+| 50 | 23 | 23 | 0.095 | 0.46 |
+| 100 | 51 | 52 | 0.214 | 0.52 |
+| 200 | 98 | 101 | 0.416 | 0.51 |
+| 331 | 127 | 140 | 0.576 | 0.42 |
+| 500 | 155 | 162 | 0.667 | 0.32 |
+| all (1991) | 167 | 167 | 0.687 | — |
+
+The hypothesis holds where it can act: wallets that forwarded funds are less often listed,
+and moving them down gains 13 dev hits by rank 331.
+**Why it fails the 0.15 goal:** the top 50 contained no senders, so nothing above rank 65 changed.
+Every top candidate already looks like a holding wallet, as the seeds do.
+Our reading is that the ~27 non-dev addresses in the top 50 are mostly test-listed,
+but that is only checked at the final scoring.
+
+**14:50 — Condition 1 met by the alternative: three further iterations (2, 3, 4) failed to reach dev recall@50 ≥ 0.15, each with its reason.**
+The common cause is the split ceiling (13:37): about 0.103 expected for any rule that does not see the dev/test split.
+Iteration 2 reached 92% of it. Rule design stops here; next is the one-time final scoring on test.
