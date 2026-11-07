@@ -7,12 +7,14 @@ Raw responses are cached in data/raw/etherscan/<address>.json and reused,
 so re-running only fetches what is missing.
 Writes data/edges.csv and data/raw/etherscan/manifest.json.
 
-Usage: python scripts/fetch_seeds.py   (needs ETHERSCAN_API_KEY in .env)
+Usage: python scripts/fetch_seeds.py [--hop2]   (needs ETHERSCAN_API_KEY in .env)
+  --hop2  fetch the neighbours of the seeds instead, into data/edges_hop2.csv
 """
 
 import csv
 import json
 import re
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -69,8 +71,18 @@ def main():
     start, end = manifest["blocks"]
     manifest.setdefault("truncated", [])
 
+    hop2 = "--hop2" in sys.argv
     with open(ROOT / "data/seeds.csv", newline="") as f:
-        seeds = [row["address"] for row in csv.DictReader(f)]
+        seed_set = {row["address"] for row in csv.DictReader(f)}
+    if hop2:
+        # Neighbours of the seeds, taken from the hop-1 edges (no labels involved).
+        with open(ROOT / "data/edges.csv", newline="") as f:
+            rows = list(csv.DictReader(f))
+        seeds = sorted({x for r in rows for x in (r["from"], r["to"])} - seed_set)
+        out_path = ROOT / "data/edges_hop2.csv"
+    else:
+        seeds = sorted(seed_set)
+        out_path = ROOT / "data/edges.csv"
 
     edges = []
     for i, addr in enumerate(seeds, 1):
@@ -92,14 +104,15 @@ def main():
     # The same transfer appears in the files of both endpoints when two seeds trade with each other.
     unique = {(e["tx_hash"], e["kind"], e["from"], e["to"], e["asset"], e["value"]): e for e in edges}
     edges = sorted(unique.values(), key=lambda e: (e["block"], e["tx_hash"]))
-    with open(ROOT / "data/edges.csv", "w", newline="") as f:
+    with open(out_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         w.writerows(edges)
 
-    manifest["fetched_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    manifest["n_seeds"] = len(seeds)
-    manifest["n_edges"] = len(edges)
+    tag = "hop2" if hop2 else "hop1"
+    manifest[f"fetched_at_{tag}"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    manifest[f"n_addresses_{tag}"] = len(seeds)
+    manifest[f"n_edges_{tag}"] = len(edges)
     manifest_path.write_text(json.dumps(manifest, indent=2))
     print(f"edges={len(edges)} blocks={start}-{end} truncated={len(manifest['truncated'])}")
 

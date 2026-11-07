@@ -60,3 +60,28 @@ Interpretation: the funders of the seeds are not on the dev list.
 The list appears to name holding addresses, not the distributors that filled them.
 Next hypothesis (iteration 1): **siblings** — other addresses paid by the same funders in the same window
 are likely to be listed. Requires fetching the funders' outgoing transfers.
+
+**13:27 — Hop 2 fetched.**
+`scripts/fetch_seeds.py --hop2`: the 118 neighbours of the seeds (all funders), same window.
+8530 edges in `data/edges_hop2.csv`, nothing truncated.
+Note: `run_iteration.py` now loads hop-1 and hop-2 edges; iteration 0 was scored on hop-1 only.
+
+**13:27 — Iteration 1 (siblings): first signal.**
+Hypothesis: listed addresses are holding wallets filled in batches;
+other recipients of the same funders are likely in the same batch.
+Rule `rules/siblings.py`: score = Σ over funders of (seeds paid / recipients paid); native ETH only, spoofed tokens ignored.
+Dev (243 addresses), `results/iter_1.json`:
+
+| k | hits | recall@k | precision_lb@k |
+|---|---|---|---|
+| 10 | 6 | 0.025 | 0.60 |
+| 50 | 18 | 0.074 | 0.36 |
+| 100 | 43 | 0.177 | 0.43 |
+| 200 | 76 | 0.313 | 0.38 |
+| all (482) | 127 | 0.523 | — |
+
+Beats iteration 0 (recall 0 everywhere), so the first goal condition is met on dev.
+Ceiling: 48% of dev addresses are not paid by any seed funder in the window,
+so no reordering of these 482 candidates can find them; reaching them needs another hop or a wider window.
+Precision_lb@10 of 0.60 but only 0.36 at 50: the top of the ranking is diluted.
+Next: re-rank siblings by similarity to the seeds' own funding (amount band, time of the batch).

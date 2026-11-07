@@ -22,8 +22,12 @@ ROOT = Path(__file__).parents[1]
 
 
 def load_edges():
-    with open(ROOT / "data/edges.csv", newline="") as f:
-        rows = list(csv.DictReader(f))
+    rows = []
+    for name in ("edges.csv", "edges_hop2.csv"):
+        path = ROOT / "data" / name
+        if path.exists():
+            with open(path, newline="") as f:
+                rows.extend(csv.DictReader(f))
     for r in rows:
         r["value"] = float(r["value"])
         r["timestamp"] = int(r["timestamp"])
