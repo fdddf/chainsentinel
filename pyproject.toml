@@ -1,0 +1,21 @@
+[project]
+name = "chainsentinel"
+version = "0.1.0"
+description = "A research loop that tries to recover held-out FBI-listed laundering addresses from a few seeds using public Ethereum data."
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = ["pandas", "networkx", "requests"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
