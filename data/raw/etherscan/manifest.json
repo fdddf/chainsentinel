@@ -7,11 +7,39 @@
     26280314,
     26316188
   ],
-  "truncated": [],
+  "truncated": [
+    "0x0cef320d0c5793ade37964e2661a033771e53cd5:txlistinternal",
+    "0x0cef320d0c5793ade37964e2661a033771e53cd5:tokentx",
+    "0x23617e59a5925b2a4bf75d73ff6711cd0b29de85:txlistinternal",
+    "0x23617e59a5925b2a4bf75d73ff6711cd0b29de85:tokentx",
+    "0x000000000004444c5dc75cb358380d2e3de08a90:txlistinternal",
+    "0x000000000004444c5dc75cb358380d2e3de08a90:tokentx",
+    "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae:txlist",
+    "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae:txlistinternal",
+    "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae:tokentx",
+    "0x3d90f66b534dd8482b181e24655a9e8265316be9:txlistinternal",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:txlist",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:txlistinternal"
+  ],
   "fetched_at": "2026-11-07T12:20:36+00:00",
   "n_seeds": 122,
   "n_edges": 244,
   "fetched_at_hop2": "2026-11-07T12:27:22+00:00",
   "n_addresses_hop2": 118,
-  "n_edges_hop2": 8530
+  "n_edges_hop2": 8530,
+  "services": [
+    "0x0cef320d0c5793ade37964e2661a033771e53cd5",
+    "0x23617e59a5925b2a4bf75d73ff6711cd0b29de85",
+    "0x000000000004444c5dc75cb358380d2e3de08a90",
+    "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
+    "0x3d90f66b534dd8482b181e24655a9e8265316be9",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+  ],
+  "fetched_at_hop3": "2026-11-07T12:50:15+00:00",
+  "n_addresses_hop3": 13,
+  "n_edges_hop3": 418076,
+  "n_uncles_before_cap_hop4": 3181,
+  "fetched_at_hop4": "2026-11-07T13:22:10+00:00",
+  "n_addresses_hop4": 600,
+  "n_edges_hop4": 225083
 }

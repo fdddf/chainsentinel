@@ -33,3 +33,28 @@ def normalise(responses: dict) -> list[dict]:
             if r:
                 rows.append(r)
     return rows
+
+
+def open_text(path):
+    """Open a data file, or its gzipped copy `<path>.gz` (used for files over 50 MB)."""
+    import gzip
+    from pathlib import Path
+
+    path = Path(path)
+    if path.exists():
+        return open(path, newline="")
+    return gzip.open(f"{path}.gz", "rt", newline="")
+
+
+def cache_exists(path) -> bool:
+    from pathlib import Path
+
+    return Path(path).exists() or Path(f"{path}.gz").exists()
+
+
+def read_cache(path) -> dict:
+    """One cached Etherscan response file (plain or gzipped)."""
+    import json
+
+    with open_text(path) as f:
+        return json.load(f)

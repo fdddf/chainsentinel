@@ -168,3 +168,40 @@ The top 20 candidates that are not in dev each got one payment of 13 to 200 ETH 
 They look like the same batches as the seeds. Many are probably on the test half,
 and nothing in the transaction data could tell them apart from the dev hits.
 Ranking is close to saturated; the remaining lever is reach (iteration 3).
+
+**13:45–14:22 — Hop 3 (parents) and hop 4 (uncles) fetched.** `fetch_seeds.py --hop3`, `--hop4`.
+- **Bug found and fixed while fetching:** Etherscan returns at most 1000 rows per call, not 10000,
+  so the old truncation check (`≥ 10000`) could never fire.
+  It now pages 1000 at a time and continues from the last block seen;
+  an action is truncated (and its address marked a service) past 50 000 rows (10 000 in `--hop4`).
+  The hop-1 and hop-2 caches are unaffected: no file there reaches 1000 rows.
+- Parents: 14 addresses paid ≥ 1 ETH to ≥ 2 seed funders; LI.FI's router was skipped,
+  13 fetched (418 076 edges). `0x0cef320d…` and `0x23617e59…` were truncated and are marked as services, not expanded.
+- Uncles: 3181 recipients of ≥ 1 ETH from parents; **capped to the 600 that received the most** (each ≥ 14.5 ETH).
+  4 of them are services (Uniswap v4 PoolManager, WETH, LI.FI, `0x3d90f66b…`).
+  225 083 edges, 1973 API calls, no errors.
+- Size: the cache grew to 656 MB, with one 226 MB file. Every file over 50 MB is now committed gzipped
+  (`*.json.gz`, `edges_hop3.csv.gz`); `chainsentinel.edges.open_text` reads either form,
+  and iteration 3 reproduces exactly from the gzipped data.
+
+**14:24 — Iteration 3 (cousins): reach 0.523 → 0.687; recall@50 unchanged at 0.095 (failure 2 of 3).**
+Rule `rules/cousins.py`, tests `tests/test_cousins.py` (written first, failed at import, then passed).
+Siblings keep their iteration-2 order (ranks 1–331); 1660 cousins follow,
+scored by parent focus × how much the uncle pays like a seed funder × the payment's fit to the seeds' interquartile amount band.
+Dev, `results/iter_3.json` (precision is a lower bound):
+
+| k | hits | recall@k | precision_lb@k |
+|---|---|---|---|
+| 50 | 23 | 0.095 | 0.46 |
+| 200 | 98 | 0.403 | 0.49 |
+| 331 (end of siblings) | 127 | 0.523 | 0.38 |
+| 500 | 155 | 0.638 | 0.31 |
+| 1000 | 167 | 0.687 | 0.17 |
+| all (1991) | 167 | 0.687 | — |
+
+40 dev addresses that no seed funder paid are now reached, 28 of them in the first 169 cousins.
+**Why it fails the 0.15 goal:** the iteration was aimed at reach, and siblings are ranked first by construction,
+so the top 50 cannot change. Even interleaving would not help, because the top 50 is already near the ~0.103 ceiling.
+Still out of reach: 76 dev addresses (31%).
+They may hang off the 2581 uncles cut by the cap, behind the two parents marked as services,
+or be funded outside the 2026-10-27 to 11-01 window.
