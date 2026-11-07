@@ -12,8 +12,9 @@ Move finished tasks to the bottom with the commit hash.
    (`tx_hash, block, timestamp, from, to, asset, value, kind`).
    Respect the free-tier rate limit.
 2. **Iteration 0: baseline.**
-   Rank every 1-hop counterparty of the seeds by the total value it received from seeds.
-   Evaluate and write `results/iter_0.json`.
+   Rank every 1-hop neighbour of the seeds (either direction) by the number of distinct seeds it touched, then by transfer count.
+   Not by value: tokens have no common price in our data.
+   `python scripts/run_iteration.py 0 baseline`.
 3. **Service-address filter.**
    Mark high-degree counterparties (exchanges, routers, bridges, swap services) and stop expansion there.
    Measure how the filter changes the baseline.

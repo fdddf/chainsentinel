@@ -1,6 +1,6 @@
 import pytest
 
-from chainsentinel.evaluate import evaluate
+from chainsentinel.evaluate import evaluate, split_holdout
 
 SEEDS = {"0xs1", "0xs2"}
 HOLDOUT = {"0xh1", "0xh2", "0xh3", "0xh4"}
@@ -28,3 +28,11 @@ def test_k_larger_than_ranking():
     m = evaluate(["0xh1"], holdout=HOLDOUT, seeds=SEEDS, ks=(50,))
     assert m["recall@50"] == pytest.approx(1 / 4)
     assert m["n_candidates"] == 1
+
+
+def test_holdout_split_is_stable_disjoint_and_balanced():
+    addrs = [f"0x{i:040x}" for i in range(400)]
+    dev, test = split_holdout(addrs)
+    assert set(dev).isdisjoint(test) and set(dev) | set(test) == set(addrs)
+    assert split_holdout(list(reversed(addrs))) == (dev, test)
+    assert 150 < len(dev) < 250

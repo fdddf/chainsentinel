@@ -15,7 +15,7 @@ and explainable heuristics.
 
 Done when either:
 
-- `results/iter_*.json` contains an iteration whose `recall@50` beats iteration 0 (the baseline),
+- `results/iter_*.json` contains an iteration whose dev `recall@50` beats iteration 0 (the baseline),
   and README.md reports it with links to the files; or
 - JOURNAL.md documents at least 4 iterations that failed to beat the baseline, with the reasons,
   and README.md reports that negative result.
@@ -27,18 +27,21 @@ Done when either:
 3. For a new heuristic: read `refs/` for an idea not tried yet,
    write it as a hypothesis in JOURNAL.md,
    write a failing test in `tests/`, then implement it in `src/chainsentinel/rules/`.
-4. Produce a ranked candidate list `results/candidates_iter_N.csv` (column `address`)
-   using only `data/seeds.csv` and the cached transaction data.
-5. Score it only with `python -m chainsentinel.evaluate results/candidates_iter_N.csv`
-   and save the output as `results/iter_N.json`.
-6. Look at the top false positives and at held-out addresses that were missed,
+4. Run `python scripts/run_iteration.py N <rule_module> "note"`.
+   It gives the rule only `data/edges.csv` and `data/seeds.csv`,
+   writes `results/candidates_iter_N.csv` and scores it on the **dev** half of the holdout into `results/iter_N.json`.
+5. Look at `dev_hits_top`, `dev_missed_sample` and the top unlabelled candidates,
    write what you learned to JOURNAL.md, and add the next hypothesis to TASKS.md.
+6. Compare iterations on dev only. The test half is scored once at the end with
+   `python -m chainsentinel.evaluate results/candidates_iter_N.csv --final`
+   for every iteration, and reported as is, whether or not it agrees with dev.
 7. Update this file if the plan changed. Commit after each finished task.
 
 ## Hard rules
 
 - Rules and features must never read `data/holdout.csv` or `data/labels.csv`.
   Only `chainsentinel.evaluate` may read the holdout.
+- Never look at test-split addresses or test metrics while designing a rule.
 - Never expand the graph from a held-out address because it is held out.
   Expansion starts from seeds and from candidates the rule itself produced.
 - Never call an address malicious or attribute control.
