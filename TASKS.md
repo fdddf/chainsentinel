@@ -5,11 +5,10 @@ Move finished tasks to the bottom with the commit hash.
 
 ## Open
 
-1. **Final**: `python scripts/final_report.py` → `results/final.json`, `results/recall_by_iteration.png`;
-   README "Results" section with table, links and limits.
-2. **Ablation and sensitivity**: rerun the best rule with `seed=1..5` to show variance of recall (next session).
-3. **Service filter for candidates**: exchanges such as Binance's hot wallet reach the cousin list (iteration 3); demote them before ranking (next session).
-4. **Lift the uncle cap** (600 of 3181) and widen the window past 2026-11-01 for the 31% of dev still unreached (next session).
+1. **Ablation and sensitivity**: rerun the best rule with `seed=1..5` to show variance of recall (next session).
+2. **Service filter for candidates**: exchanges such as Binance's hot wallet reach the cousin list (iteration 3); demote them before ranking (next session).
+3. **Lift the uncle cap** (600 of 3181) and widen the window past 2026-11-01 for the 31% of dev still unreached (next session).
+4. **Whole-holdout recall@k** next to the per-half numbers, so top-k is not capped by the split.
 
 ## Done
 
@@ -23,3 +22,4 @@ Move finished tasks to the bottom with the commit hash.
 - Iteration 2 similarity: dev recall@50 0.095, recall@all 0.523 — 5702507.
 - Iteration 3 cousins: dev recall@all 0.523 → 0.687 — 682b9ba.
 - Iteration 4 sinks: dev recall@50 0.095, recall@331 0.523 → 0.576; condition 1 met by three documented failures.
+- Final scoring of iterations 0–4 on test, plot, README Results — see the commit after d7f2d03.

@@ -2,7 +2,7 @@
 
 Run only after the last iteration is frozen: this is the one place test metrics are produced.
 
-Usage: python scripts/final_report.py
+Usage: python scripts/final_report.py [--plot-only]
 Reads results/iter_N.json (rule, note) and results/candidates_iter_N.csv,
 writes results/final.json and results/recall_by_iteration.png.
 
@@ -13,6 +13,7 @@ on either half alone, listed addresses of the other half count as misses.
 
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -33,6 +34,9 @@ def iterations() -> list[int]:
 
 
 def main():
+    if "--plot-only" in sys.argv:  # redraw from results/final.json without scoring again
+        plot(json.loads((ROOT / "results/final.json").read_text())["iterations"])
+        return
     seeds = read_addresses(ROOT / "data/seeds.csv")
     holdout = read_addresses(ROOT / "data/holdout.csv")
     rows = []
@@ -51,7 +55,16 @@ def main():
            "note": "precision_lb is a lower bound: unlisted addresses are unlabelled, not benign",
            "iterations": rows}
     (ROOT / "results/final.json").write_text(json.dumps(out, indent=2))
+    plot(rows)
 
+    for r in rows:
+        print(f"iter {r['iteration']} [{r['rule']}] "
+              f"dev r@50={r['dev']['recall@50']:.3f} r@all={r['dev']['recall@all']:.3f} | "
+              f"test r@50={r['test']['recall@50']:.3f} r@all={r['test']['recall@all']:.3f} | "
+              f"listed precision_lb@50={r['listed_precision_lb']['@50']:.2f}")
+
+
+def plot(rows):
     xs = [r["iteration"] for r in rows]
     fig, ax = plt.subplots(figsize=(7, 4.2), dpi=150)
     styles = {"dev": "-", "test": "--"}
@@ -61,8 +74,8 @@ def main():
         ax.plot(xs, [r[split]["recall@all"] for r in rows], ls, marker="s", color="#d9822b",
                 label=f"{split} recall@all")
     ax.axhline(25 / 243, color="#888", lw=0.8, ls=":")
-    ax.text(xs[-1], 25 / 243 + 0.012, "split-agnostic ceiling of recall@50 ≈ 0.10",
-            ha="right", fontsize=7, color="#555")
+    ax.text(xs[-1], 25 / 243 - 0.022, "expected ceiling of recall@50 per half ≈ 0.10\n(a rule cannot see the dev/test split)",
+            ha="right", va="top", fontsize=7, color="#555")
     ax.set_xticks(xs, [f"{r['iteration']}\n{r['rule']}" for r in rows], fontsize=8)
     ax.set_ylim(0, 1)
     ax.set_ylabel("recall on held-out FBI addresses")
@@ -72,12 +85,6 @@ def main():
     ax.legend(fontsize=7, frameon=False, loc="upper left")
     fig.tight_layout()
     fig.savefig(ROOT / "results/recall_by_iteration.png")
-
-    for r in rows:
-        print(f"iter {r['iteration']} [{r['rule']}] "
-              f"dev r@50={r['dev']['recall@50']:.3f} r@all={r['dev']['recall@all']:.3f} | "
-              f"test r@50={r['test']['recall@50']:.3f} r@all={r['test']['recall@all']:.3f} | "
-              f"listed precision_lb@50={r['listed_precision_lb']['@50']:.2f}")
 
 
 if __name__ == "__main__":

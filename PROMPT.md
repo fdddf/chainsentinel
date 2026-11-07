@@ -13,8 +13,14 @@ from the 2026-10-29 Binance theft,
 starting from a 20% seed sample and using only public Ethereum transaction data
 and explainable heuristics.
 
-Status: iteration 1 (`rules/siblings.py`) reached dev recall@50 = 0.074, recall@all = 0.523.
-Iteration 0 (baseline) scored 0. See JOURNAL.md.
+Status (2026-11-07 14:52 CET): **goal met by the alternative condition.**
+Iterations 2 (`similarity`), 3 (`cousins`) and 4 (`sinks`) all stayed at dev recall@50 = 0.095.
+JOURNAL.md records each with its reason: recall@50 per half has an expected ceiling of ≈ 0.103,
+because no rule can see the dev/test split. 49 of the top 50 are FBI-listed.
+Reach rose from recall@all 0.523 to 0.687 (dev) and 0.724 (test).
+Final scores are in `results/final.json`, the plot in `results/recall_by_iteration.png`, and the write-up in the README "Results" section.
+A next session should start from TASKS.md: seed variance, a service filter, the uncle cap and the window,
+and recall@k on the whole held-out set.
 
 Done when **all** of these hold:
 
@@ -30,8 +36,9 @@ and go straight to items 2–4; the submission deadline is 17:00.
 ## Environment
 
 - Run Python through the project venv: `.venv/bin/python`, `.venv/bin/pytest`.
-- Data for rules: `data/edges.csv` (hop 1, into seeds) and `data/edges_hop2.csv` (the funders' activity).
-  More data: `scripts/fetch_seeds.py` (needs `.env`); cache every response.
+- Data for rules: `data/edges.csv` (hop 1, into seeds), `data/edges_hop2.csv` (funders), `data/edges_hop3.csv.gz` (parents),
+  `data/edges_hop4.csv` (uncles), `data/edges_cand.csv.gz` (own activity of top candidates, only for rules with `USES_CANDIDATE_EDGES`).
+  More data: `scripts/fetch_seeds.py`, `scripts/fetch_candidates.py` (need `.env`); cache every response; gzip files over 50 MB.
 
 ## Loop
 
@@ -41,7 +48,7 @@ and go straight to items 2–4; the submission deadline is 17:00.
    write it as a hypothesis in JOURNAL.md,
    write a failing test in `tests/`, then implement it in `src/chainsentinel/rules/`.
 4. Run `python scripts/run_iteration.py N <rule_module> "note"`.
-   It gives the rule only `data/edges.csv` and `data/seeds.csv`,
+   It gives the rule only the seeds and the fetched edges (never holdout or labels),
    writes `results/candidates_iter_N.csv` and scores it on the **dev** half of the holdout into `results/iter_N.json`.
 5. Look at `dev_hits_top`, `dev_missed_sample` and the top unlabelled candidates,
    write what you learned to JOURNAL.md, and add the next hypothesis to TASKS.md.

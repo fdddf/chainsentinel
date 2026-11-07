@@ -243,3 +243,26 @@ but that is only checked at the final scoring.
 **14:50 — Condition 1 met by the alternative: three further iterations (2, 3, 4) failed to reach dev recall@50 ≥ 0.15, each with its reason.**
 The common cause is the split ceiling (13:37): about 0.103 expected for any rule that does not see the dev/test split.
 Iteration 2 reached 92% of it. Rule design stops here; next is the one-time final scoring on test.
+
+**14:51 — Final scoring, once, after rule design stopped.**
+`python -m chainsentinel.evaluate results/candidates_iter_N.csv --final` for N = 0..4,
+and `scripts/final_report.py` → `results/final.json` (checked identical to the CLI output) and `results/recall_by_iteration.png`.
+The plot was then redrawn with `--plot-only` (label position only), without scoring again.
+
+| iter | dev r@50 | test r@50 | dev r@all | test r@all | listed precision_lb@50 |
+|---|---|---|---|---|---|
+| 0 baseline | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 |
+| 1 siblings | 0.074 | 0.082 | 0.523 | 0.519 | 0.76 |
+| 2 similarity | 0.095 | 0.107 | 0.523 | 0.519 | 0.98 |
+| 3 cousins | 0.095 | 0.107 | 0.687 | 0.724 | 0.98 |
+| 4 sinks | 0.095 | 0.107 | 0.687 | 0.724 | 0.98 |
+
+- **Test agrees with dev.** It is within 6 points everywhere and higher on reach, so no sign of overfitting to dev.
+- **The ceiling argument holds.** From iteration 2 on, 49 of the top 50 are FBI-listed (23 dev + 26 test).
+  The top of the ranking is as good as it can be for this metric.
+- Over the whole held-out set, iteration 3/4 candidates contain 343 of 486 addresses (71%).
+- Precision figures stay lower bounds (unlisted ≠ benign).
+- Bookkeeping caveat: `code_commit` in `results/iter_N.json` is the HEAD at run time,
+  and the rule being scored was not yet committed then. The rule is in the next commit.
+
+README "Results" section written: table, plot, findings, failures with the reason, limits, next steps.
