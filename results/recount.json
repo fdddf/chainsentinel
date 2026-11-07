@@ -1,0 +1,52 @@
+[
+  {
+    "iteration": 0,
+    "candidates": 118,
+    "listed_in_pool": 0,
+    "listed_share_of_pool": 0.0,
+    "listed_in_top50": 0,
+    "expected_listed_in_top50_random_order": 0.0,
+    "holdout_reached": 0,
+    "holdout_size": 486
+  },
+  {
+    "iteration": 1,
+    "candidates": 482,
+    "listed_in_pool": 253,
+    "listed_share_of_pool": 0.525,
+    "listed_in_top50": 38,
+    "expected_listed_in_top50_random_order": 26.2,
+    "holdout_reached": 253,
+    "holdout_size": 486
+  },
+  {
+    "iteration": 2,
+    "candidates": 331,
+    "listed_in_pool": 253,
+    "listed_share_of_pool": 0.764,
+    "listed_in_top50": 49,
+    "expected_listed_in_top50_random_order": 38.2,
+    "holdout_reached": 253,
+    "holdout_size": 486
+  },
+  {
+    "iteration": 3,
+    "candidates": 1991,
+    "listed_in_pool": 343,
+    "listed_share_of_pool": 0.172,
+    "listed_in_top50": 49,
+    "expected_listed_in_top50_random_order": 8.6,
+    "holdout_reached": 343,
+    "holdout_size": 486
+  },
+  {
+    "iteration": 4,
+    "candidates": 1991,
+    "listed_in_pool": 343,
+    "listed_share_of_pool": 0.172,
+    "listed_in_top50": 49,
+    "expected_listed_in_top50_random_order": 8.6,
+    "holdout_reached": 343,
+    "holdout_size": 486
+  }
+]

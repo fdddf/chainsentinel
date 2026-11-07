@@ -145,7 +145,9 @@ def uncles_of(seed_set: set[str], manifest: dict) -> list[str]:
         if r["from"] in parents and r["from"] not in services:
             received[r["to"]] = received.get(r["to"], 0.0) + float(r["value"])
     excluded = seed_set | funders | parents
-    uncles = [u for u in received if u not in excluded and not cache_exists(CACHE / f"{u}.json")]
+    # Selection must not depend on what is already cached, so that a rerun picks the same uncles
+    # (cached ones are then reused by main() instead of being fetched again).
+    uncles = [u for u in received if u not in excluded]
     print(f"uncles before cap: {len(uncles)}")
     manifest["n_uncles_before_cap_hop4"] = len(uncles)
     if len(uncles) > MAX_UNCLES:

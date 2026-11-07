@@ -31,9 +31,9 @@ every number in `results/` is produced by `chainsentinel.evaluate` from committe
 | Read | Planned: pick an untested heuristic from the literature and incident reports. **Not used today** — see below | `refs/README.md` |
 | Explore | Look at the funding pattern of the seeds (no labels) and derive the next hypothesis from it | `JOURNAL.md` 13:20, 13:37 |
 | Hypothesise | Write it down before running anything | `JOURNAL.md` |
-| Test first | Write a failing test showing how the rule is used | `tests/` |
+| Test first | Write a failing test showing how the rule is used (iterations 1–3; for iteration 4 the tests were written with the rule, JOURNAL 14:49) | `tests/` |
 | Run | Rank candidates from the seeds and the cached transaction graph | `src/chainsentinel/rules/` |
-| Check | Score against the held-out addresses | `src/chainsentinel/evaluate.py`, `results/iter_N.json` |
+| Check | Score against the held-out addresses. Only evaluation code reads them: `evaluate.py`, and `scripts/final_report.py` / `scripts/recount.py` after rule design stopped | `src/chainsentinel/evaluate.py`, `results/iter_N.json` |
 | Reflect | Inspect misses and top unlabelled candidates, queue the next idea | `JOURNAL.md`, `TASKS.md` |
 
 State lives in files (`PROMPT.md`, `TASKS.md`, `JOURNAL.md`),
@@ -75,6 +75,8 @@ an address not on the list is unlabelled, not innocent.
   Their other recipients are listed far more often than chance: half of the held-out addresses are among them (iteration 1).
 - **The top of the ranking is almost all listed.**
   From iteration 2 on, 49 of the top 50 candidates are FBI-listed addresses the rule was not given (23 in dev, 26 in test).
+  Base rate ([`results/recount.json`](results/recount.json), `scripts/recount.py`): a random order of the same pool would give about 38 of 50 in iteration 2 (76% of its 331 candidates are listed),
+  but only about 9 of 50 in iterations 3–4 (17% of 1991). So in iteration 2 the pool does most of the work; in iterations 3–4 the ranking does.
   The rule only uses the seeds and public transfers: amounts like the seeds', no dust, a funder that mostly paid seeds.
 - **Reach comes from going one hop up and back down.**
   The funders' own funders paid other distributors; their recipients add 40 dev and 50 test addresses.
@@ -103,9 +105,9 @@ the loop found that it was out of reach (JOURNAL 13:37) instead of chasing it.
 - **Coverage choices.** Window 2026-10-27 to 11-01. Uncles capped at the 600 largest of 3181.
   Two parents and four uncles were treated as services (exchanges, routers, WETH) and not expanded.
   31% of dev and 28% of test remain unreached.
-- **Services can still be candidates**: Binance's hot wallet enters iteration 3 at rank 368 (iteration 4 moves it down).
+- **Services can still be candidates**: Binance's hot wallet enters iteration 3 at rank 367 (iteration 4 moves it down).
   A candidate list is a review queue, not a finding.
-- **Selection on dev.** 11 variants were compared on dev for iteration 2, so dev numbers are optimistic. Test was used once.
+- **Selection on dev.** 11 variants were compared on dev for iteration 2 (table in JOURNAL 13:38, produced by an uncommitted prototype script; only the chosen rule is in the repo), so dev numbers are optimistic. Test was used once.
 - **Single split.** One seed sample (`seed=42`); variance over other samples was not measured.
 - **One incident, one actor, Ethereum only.** No claim of generality.
 - **No attribution.** Ranked candidates are addresses to review, never a statement about who controls them.
@@ -119,13 +121,17 @@ Report recall@k on the whole held-out set next to the per-half numbers, so the t
 ## How to run
 
 ```shell
+git clone https://github.com/fdddf/chainsentinel && cd chainsentinel   # about 460 MB: cached Etherscan responses
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'
 pytest                                   # labels, split, evaluation and rule tests
 python scripts/build_labels.py           # rebuild data/*.csv from the archived FBI alert
-python scripts/run_iteration.py 4 sinks  # re-run a rule offline from the cached data (dev metrics)
+python scripts/run_iteration.py 4 sinks  # re-run a rule offline from the cached data (dev metrics);
+                                         # loads ~1.1M edges: ~6 s, ~1.3 GB RAM on a laptop
+git diff --stat results/                 # the candidates file should be unchanged; iter_N.json differs only in run_at/code_commit
 python -m chainsentinel.evaluate results/candidates_iter_4.csv --final   # dev and test
 python scripts/final_report.py           # results/final.json and results/recall_by_iteration.png
+python scripts/recount.py                # results/recount.json: top-50 counts with random-order base rate
 ```
 
 Fetching new transaction data needs an Etherscan API key in `.env` (see `.env.example`).
@@ -136,7 +142,8 @@ Evaluating the committed results needs no key.
 - FBI alert of 2026-10-31, archived by the Wayback Machine on 2026-11-07:
   `data/raw/fbi_alert_2026-10-31.wayback-20261107060018.html`.
   A work of the US federal government.
-- Ethereum transaction data from the Etherscan API, cached in `data/raw/etherscan/` (files over 50 MB gzipped).
+- Ethereum transaction data from the Etherscan API (powered by [Etherscan.io](https://etherscan.io) APIs), cached in `data/raw/etherscan/` (files over 50 MB gzipped).
+  The responses are public chain data; check Etherscan's API terms before reusing the cache beyond research.
   Fetch scripts: `scripts/fetch_seeds.py` (`--hop2`, `--hop3`, `--hop4`), `scripts/fetch_candidates.py`.
 - All data is public. No private or personal data is used.
 

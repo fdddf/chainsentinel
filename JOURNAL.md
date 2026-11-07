@@ -210,8 +210,8 @@ or be funded outside the 2026-10-27 to 11-01 window.
 expansion from the rule's own candidates: iteration 2's 331, then iteration 3's top 600; 2186 API calls).
 Label-free check first: only 19 of the 331 siblings sent ≥ 0.01 ETH in the window, none of them in the top 50 and 2 in the top 100.
 So the sink signal could reorder only below rank 50.
-Two of these "candidates" are services: Binance's hot wallet `0x28c6…1d60` entered iteration 3 as a cousin at rank 368,
-and `0x23617e59…` is both a sibling (rank 325) and a parent marked as a service.
+Two of these "candidates" are services: Binance's hot wallet `0x28c6…1d60` entered iteration 3 as a cousin at rank 367,
+and `0x23617e59…` is both a sibling (rank 324) and a parent marked as a service.
 Iteration 3 lets services through as candidates; iteration 4 is meant to push them down.
 
 **14:49 — Iteration 4 (sinks): recall@50 unchanged at 0.095 (failure 3 of 3); mid-ranks improve.**
@@ -270,3 +270,13 @@ README "Results" section written: table, plot, findings, failures with the reaso
 **15:35 — README corrected after review (session 1).**
 The Loop table claimed a literature step that no journal entry shows; now marked as not used today, with the real "explore" step and a next step to close the gap.
 Noted that the 0.15 target was ours and unreachable by construction. Removed the duplicated Limits section.
+
+**15:55 — Fixes after a mock review against the official judging skill (session 1).**
+- `fetch_seeds.py --hop4`: uncle selection no longer depends on the cache, so a rerun reuses the same 600 uncles
+  instead of fetching the next 600. Checked: same 3181 before the cap, all 600 selected already cached.
+- New `scripts/recount.py` → `results/recount.json`: top-50 listed counts with a random-order base rate.
+  Iteration 2: 49 vs ~38 expected (pool 76% listed). Iterations 3–4: 49 vs ~9 expected (pool 17% listed).
+- Reproduction check: `run_iteration.py 4 sinks` gives a byte-identical `candidates_iter_4.csv` (5.6 s, 1.26 GB peak RSS).
+- Corrected ranks (Binance hot wallet 367, `0x23617e59…` 324; 368/325 were CSV line numbers).
+- README/PROMPT: `final_report.py` also reads the holdout; iteration 4 was not test-first;
+  the iteration-2 variant table came from an uncommitted prototype. Removed unused dependencies.

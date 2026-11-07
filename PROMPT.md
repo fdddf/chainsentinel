@@ -60,7 +60,7 @@ and go straight to items 2–4; the submission deadline is 17:00.
 ## Hard rules
 
 - Rules and features must never read `data/holdout.csv` or `data/labels.csv`.
-  Only `chainsentinel.evaluate` may read the holdout.
+  Only evaluation code may read the holdout: `chainsentinel.evaluate`, and `scripts/final_report.py` / `scripts/recount.py` after rule design.
 - Never look at test-split addresses or test metrics while designing a rule.
 - Never expand the graph from a held-out address because it is held out.
   Expansion starts from seeds and from candidates the rule itself produced.
