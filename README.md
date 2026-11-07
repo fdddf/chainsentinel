@@ -28,7 +28,8 @@ every number in `results/` is produced by `chainsentinel.evaluate` from committe
 
 | Step | What happens | Where |
 |---|---|---|
-| Read | Pick an untested heuristic from the literature and incident reports | `refs/README.md` |
+| Read | Planned: pick an untested heuristic from the literature and incident reports. **Not used today** — see below | `refs/README.md` |
+| Explore | Look at the funding pattern of the seeds (no labels) and derive the next hypothesis from it | `JOURNAL.md` 13:20, 13:37 |
 | Hypothesise | Write it down before running anything | `JOURNAL.md` |
 | Test first | Write a failing test showing how the rule is used | `tests/` |
 | Run | Rank candidates from the seeds and the cached transaction graph | `src/chainsentinel/rules/` |
@@ -38,6 +39,12 @@ every number in `results/` is produced by `chainsentinel.evaluate` from committe
 State lives in files (`PROMPT.md`, `TASKS.md`, `JOURNAL.md`),
 so the loop survives restarts:
 `/goal continue the goal described in PROMPT.md`.
+
+**What the loop actually did today.**
+Iterations 1–4 came from exploring the data, not from the literature:
+`refs/README.md` lists two clustering papers and the incident reports, but no journal entry cites them.
+The literature step is the first gap to close (see Next steps).
+The loop ran in two Claude Code sessions: setup and iterations 0–1, then a `/goal` session for iterations 2–4 and the final scoring.
 
 ## Results
 
@@ -84,6 +91,8 @@ So even a perfect ranking puts about half test addresses in its top 50:
 **the expected ceiling is about 25/243 ≈ 0.10 per half**, and 0.15 would need ≥ 37 of 50 from one half (p ≈ 0.0005).
 Iteration 2 sits at 0.095 (dev) and 0.107 (test), at that ceiling, with 49 of 50 listed.
 The metric to improve next is reach (recall@all), not the top 50.
+The 0.15 target was set by us before the session, without checking it against the split;
+the loop found that it was out of reach (JOURNAL 13:37) instead of chasing it.
 
 **Limits.**
 
@@ -102,25 +111,10 @@ The metric to improve next is reach (recall@all), not the top 50.
 - **No attribution.** Ranked candidates are addresses to review, never a statement about who controls them.
 
 **Next steps.**
+Make the literature step real: test the deposit-address and peel-chain heuristics from `refs/` as iterations.
 Variance over seed samples (`seed=1..5`). A service filter before ranking.
 Lift the uncle cap and widen the window, for the remaining ~30%.
 Report recall@k on the whole held-out set next to the per-half numbers, so the top-k metric is not capped by the split.
-
-## Limits
-
-- **Precision is a lower bound.**
-  An address missing from the FBI list is unlabelled, not innocent;
-  we report `precision_lb@k`.
-- **Circularity.**
-  The FBI list was itself produced by tracing funds.
-  High recall may mean we re-derived the investigators' method, not that we found anything new.
-- **Snapshot.**
-  The list is from 2026-10-31; addresses used afterwards are absent.
-- **Scope.**
-  One incident, one actor, Ethereum only.
-- **No attribution.**
-  This tool ranks addresses for review.
-  It does not establish who controls an address and must not be used to accuse anyone.
 
 ## How to run
 

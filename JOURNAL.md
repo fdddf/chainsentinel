@@ -266,3 +266,7 @@ The plot was then redrawn with `--plot-only` (label position only), without scor
   and the rule being scored was not yet committed then. The rule is in the next commit.
 
 README "Results" section written: table, plot, findings, failures with the reason, limits, next steps.
+
+**15:35 — README corrected after review (session 1).**
+The Loop table claimed a literature step that no journal entry shows; now marked as not used today, with the real "explore" step and a next step to close the gap.
+Noted that the 0.15 target was ours and unreachable by construction. Removed the duplicated Limits section.
