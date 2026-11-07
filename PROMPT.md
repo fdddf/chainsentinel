@@ -13,12 +13,25 @@ from the 2026-10-29 Binance theft,
 starting from a 20% seed sample and using only public Ethereum transaction data
 and explainable heuristics.
 
-Done when either:
+Status: iteration 1 (`rules/siblings.py`) reached dev recall@50 = 0.074, recall@all = 0.523.
+Iteration 0 (baseline) scored 0. See JOURNAL.md.
 
-- `results/iter_*.json` contains an iteration whose dev `recall@50` beats iteration 0 (the baseline),
-  and README.md reports it with links to the files; or
-- JOURNAL.md documents at least 4 iterations that failed to beat the baseline, with the reasons,
-  and README.md reports that negative result.
+Done when **all** of these hold:
+
+1. Either an iteration ≥ 2 reaches dev `recall@50` ≥ 0.15 (about double iteration 1),
+   or JOURNAL.md documents at least 3 further iterations that failed to, each with the reason.
+2. Every iteration has been scored once on test with `--final`, and the numbers are in `results/final.json`.
+3. `results/recall_by_iteration.png` plots dev and test recall@50 and recall@all per iteration.
+4. README.md "Results" section reports the table, links the files, and states the limits.
+
+**Time box:** stop starting new iterations at 16:00 CET on 2026-11-07
+and go straight to items 2–4; the submission deadline is 17:00.
+
+## Environment
+
+- Run Python through the project venv: `.venv/bin/python`, `.venv/bin/pytest`.
+- Data for rules: `data/edges.csv` (hop 1, into seeds) and `data/edges_hop2.csv` (the funders' activity).
+  More data: `scripts/fetch_seeds.py` (needs `.env`); cache every response.
 
 ## Loop
 

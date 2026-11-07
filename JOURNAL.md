@@ -85,3 +85,7 @@ Ceiling: 48% of dev addresses are not paid by any seed funder in the window,
 so no reordering of these 482 candidates can find them; reaching them needs another hop or a wider window.
 Precision_lb@10 of 0.60 but only 0.36 at 50: the top of the ranking is diluted.
 Next: re-rank siblings by similarity to the seeds' own funding (amount band, time of the batch).
+
+**13:33 — Handover to a fresh Claude Code session.**
+PROMPT.md goal raised to dev recall@50 ≥ 0.15 (or 3 documented failures), plus final test scoring, plot and README, time-boxed to 16:00.
+TASKS.md reordered: iteration 2 (amount/time similarity), iteration 3 (another hop).

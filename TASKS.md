@@ -5,16 +5,12 @@ Move finished tasks to the bottom with the commit hash.
 
 ## Open
 
-1. **Fetch 1-hop data for the seeds.**
-   For each address in `data/seeds.csv`, fetch normal transactions (`txlist`), internal transactions and ERC-20 transfers (`tokentx`)
-   from Etherscan API V2 (`chainid=1`), limited to the window 2026-10-27 to 2026-11-05.
-   Cache raw JSON in `data/raw/etherscan/`, write a normalised edge list `data/edges.csv`
-   (`tx_hash, block, timestamp, from, to, asset, value, kind`).
-   Respect the free-tier rate limit.
-2. **Iteration 0: baseline.**
-   Rank every 1-hop neighbour of the seeds (either direction) by the number of distinct seeds it touched, then by transfer count.
-   Not by value: tokens have no common price in our data.
-   `python scripts/run_iteration.py 0 baseline`.
+1. **Iteration 2: re-rank siblings by similarity to the seeds' own funding.**
+   Seeds were funded 2026-10-30 05:32 to 10-31 17:40 UTC with tens of ETH each.
+   Weight sibling payments by closeness in amount and time to the seed payments of the same funder.
+   Goal: raise dev recall@50 above 0.074 (iteration 1).
+2. **Iteration 3: one more hop for the 48% of dev that siblings cannot reach.**
+   Funders of the funders, or a longer window (to 2026-11-07); cache and journal the extra API calls.
 3. **Service-address filter.**
    Mark high-degree counterparties (exchanges, routers, bridges, swap services) and stop expansion there.
    Measure how the filter changes the baseline.
@@ -32,3 +28,6 @@ Move finished tasks to the bottom with the commit hash.
 - Ground truth parsed from the archived FBI alert: 608 ETH, 19 BTC, 1 SOL (`data/labels.csv`).
 - Fixed split: 122 seeds, 486 held out (`data/seeds.csv`, `data/holdout.csv`).
 - Evaluation with tests (`src/chainsentinel/evaluate.py`, `tests/`).
+- Seed data fetched (hop 1: 244 edges) and funders fetched (hop 2: 8530 edges) — 634bd28, 7cbbcf5.
+- Iteration 0 baseline: dev recall 0 — 634bd28.
+- Iteration 1 siblings: dev recall@50 0.074, recall@all 0.523 — 7cbbcf5.
